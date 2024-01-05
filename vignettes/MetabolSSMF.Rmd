@@ -1,0 +1,182 @@
+---
+title: "An introduction to the package MetabolSSMF"
+output: 
+  pdf_document:
+    toc: true
+    toc_depth: 2
+vignette: >
+  %\VignetteIndexEntry{An introduction to the package MetabolSSMF}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  \usepackage[utf8]{inputenc}
+  \setmainfont{Times New Roman}
+bibliography: references.bib  
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, include = FALSE}
+#library(MetabolSSMF)
+```
+
+# Introduction
+
+This vignette presents the \textbf{MetabolSSMF} package, which implements a framework for Simplex-Structure Matrix Factorisation (SSMF) algorithm in $\mathrm{R}$. The objective is to provide an implementation of a standard algorithm, which allows the users simply to apply a new method to the data set that they are interested in performing soft clustering. The usage of this package will be illustrated through the example of the application on the simulated data, including the gap statistics, bootstrap resampling approach and soft adjust rand index.
+
+This document gives a quick tour of \textbf{MetabolSSMF} functionalities. It was written in R Markdown, using the knitr package for production. See help(package="MetabolSSMF") for further details.
+
+\textbf{Installation:} The latest version of the package can be installed from \textbf{Github}:
+
+```{r}
+# Install
+#devtools::install_github("WenxuanLiu1996/MetabolSSMF")
+# Load
+library(MetabolSSMF)
+set.seed(12345)
+```
+
+# Data
+
+The simulated data is built by manually creating prototype matrix $W$ and memberships matrix $H$ with certain known features. 
+
+```{r}
+# Simulated data set X with simulated W matrix (prototypes) and H matrix (memberships)
+data("SimulatedDataset")
+X <- SimulatedDataset
+
+# W matrix (prototypes matrix)
+data("SimulatedPrototypes")
+W <-  SimulatedPrototypes
+
+# H matrix (memberships matrix)
+data("SimulatedMemberships")
+H <- SimulatedMemberships
+```
+
+## Visualisation
+
+```{r, warning=FALSE}
+# Plot the prototypes
+## Load the package 'ggsci' for finding the color
+library(ggsci)
+color <- c(pal_jco("default", alpha=0.8)(7)[2], 
+           pal_jama("default", alpha=0.8)(7)[c(3:5)])
+
+par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
+matplot(W, type='l', lty = 1, ylab='Prototypes',
+        col = color, lwd=2)
+legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4])
+
+#The scatter pies plot of 2-dimensional projected clusters. It demonstrates the 
+#simulated data with 4 soft clusters, the divided areas of each pie represent 
+#the fuzzy memberships of the corresponding sample.
+library(caroline)
+pca_X <- prcomp(X, center = F, scale. = F) 
+par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
+pies(lapply(apply(H, 2, list), unlist), color.table = nv(color[1:4], paste0('Pty', 1:4)),
+     x0=pca_X$x[,1], y0=pca_X$x[,2], radii = 2, ylab='PC2', xlab='PC1')
+legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4])
+```
+
+# Clustering
+
+The algorithm can be run with only one $k$ every time. To process 'elbow criteria' or the gap statistics to choose an optimal number of prototypes, $k (= 1, \dots, K)$ times SSMF algorithm need to be run and save the results.
+
+```{r}
+# Define the number of k
+K <- 10
+
+# Run the SSMF algorithm with various k and save the results as a list
+fit_SSMF <- list()
+for(k in 1:K){
+  fit <- ssmf(as.matrix(X), k = k, lr = 0.001, meth='kmeans')
+  fit_SSMF[[k]] <- fit
+}
+```
+
+## Residual sum of squares
+
+```{r}
+# Extract the RSS and save as a vector
+rss_SSMF <- unlist(lapply(fit_SSMF, function(x) x$SSE))
+
+# Plot RSS
+plot(1:K, rss_SSMF, type="b", xlab = "K", ylab = "RSS", main='Elbow Criteria')
+```
+
+## Gap statistics
+
+```{r}
+# Apply the gap statistics to the simulated data
+fit_gap <- gap(as.matrix(X), k.vector = 1:K, rss = rss_SSMF)
+
+# Visualise the results
+par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
+plot(x = c(1:K), y = fit_gap$gap, type='b', 
+     ylim=range((fit_gap$gap), (fit_gap$gap - fit_gap$standard.error)[-1]), 
+     xlab='K', ylab='GAP', main='Gap statistics')
+lines(x = c(1:(K-1)), y = (fit_gap$gap - fit_gap$standard.error)[-1], 
+      col='blue', lty=2, type='b')
+lines(x = rep(fit_gap$optimal.k, 2), y = range(fit_gap$gap), lty = 2, col='red')
+legend('topright', inset=c(-0.35,0), 
+       col=c('black', 'blue', 'red'), lty=c(1, 2, 2), 
+       legend = c('Gap', '-1 SE', 'Optimal K'), cex=0.8)
+```
+
+Based on the results of the 'elbow criteria' and gap statistics, both of them suggest the optimal number of clusters/prototypes is 4.
+
+# Bootstrap
+
+```{r}
+# Set the number of times to bootstrap
+B <- 1000
+
+# Bootstrap
+## Initial H (memberships) matrix to start the algorithm
+## Based on the results above, k=4 here
+initialisation <- init(k=4, n = nrow(X), method = 'kmeans', data = X)
+fit_boot <- bootstrap(data=as.matrix(X), k=4, btimes=B, H = initialisation$H)
+
+# Visualise the bootstrap estimation and confidence intervals
+par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
+matplot(fit_boot$W.est, type='n', xaxt='n', ylab='Features', main='C', 
+        ylim = range(fit_boot$lower,fit_boot$upper))
+for(i in 1:4){
+  alpha <- 0.2
+  plat <- c(pal_jco("default",alpha=alpha)(7)[2], 
+            pal_jama("default", alpha=alpha)(7)[c(3:5)])
+  col <- switch(i, plat[1], plat[2], plat[3], plat[4])
+  polygon(c(1:138, 138:1), c(fit_boot$upper[,i], rev(fit_boot$lower[,i])), 
+          col = col,
+          border= col, lty = 1)
+}
+matplot(fit_boot$W.est, type='l', lty = 1, ylab='Features', 
+        add=T, col=color, lwd=2)
+legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4])
+axis(1, at=c(1, seq(10, 130, 10), 138), labels = c(1, seq(10, 130, 10), 138))
+```
+
+# Soft Adjusted Rand Index (sARI)
+
+A soft adjusted Rand index (sARI) is proposed to compare the two soft partitions (e.g., the true and estimated fuzzy memberships), more theorems are in [@flynt_sari_2019]. 
+
+```{r}
+# Compare the true and estimated fuzzy memberships
+sARI(fit_SSMF[[4]]$H, H)
+
+# Self comparison of the true fuzzy memberships
+sARI(H, H)
+```
+
+The sARI of the true and estimated fuzzy memberships is 0.34. However, if comparing two same partition matrices, the value of sARI is expected to be 1. But the sARI of true fuzzy memberships itself is 0.38. In the discussion of [@flynt_sari_2019], in most cases, sARI tends to be smaller than ARI (adjusted Rand index) because the overconfidence in hard correct classifications generally outweighs the overconfidence in hard misclassification. Therefore, it can help to reflect the uncertainty in a set of cluster assignments more accurately. In spite of this situation, we can scaled the $\mathrm{sARI}(H_{true}, H_{est})$ by the $\mathrm{sARI}(H_{true}, H_{true})$, which is $\frac{\mathrm{sARI}(H_{true}, H_{est})}{\mathrm{sARI}(H_{true}, H_{true})} = 0.895$. In other words, the estimated fuzzy memberships help to explain 89.5\% of the true fuzzy memberships.
+
+# Addition NOTE
+
+The SSMF algorithm has randomness, this document presents one of the situation with a certain seed. The results might be various with different seeds that set in $\mathrm{R}$. It is suggest to remove the seed and run the algorithm multiple times with a certain value of $k$ (the number of clusters/prototypes). Then, select a result with the lowest RSS, save it to the list and continue processing next steps.
+
+# References

@@ -1,0 +1,26 @@
+{
+    "id": "5A238D00",
+    "path": "/home/scratch/18209907/Wenxuan/Works Summary/package/MetabolSSMF/man/ssmf.Rd",
+    "project_path": "man/ssmf.Rd",
+    "type": "r_doc",
+    "hash": "2380770547",
+    "contents": "",
+    "dirty": false,
+    "created": 1700134174428.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "cursorPosition": "24,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1700218197,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1700219445968,
+    "read_only": true,
+    "read_only_alternatives": [
+        "R/Functions.R"
+    ]
+}

@@ -1,0 +1,304 @@
+# library(tidyr)
+# library(lsei)
+# library(LaplacesDemon)
+library(compositions)
+library(mvtnorm)
+# library(iterators)
+# library(foreach)
+#library(doParallel)
+library(plotrix)
+library(mclust)
+path2 <- "/home/18209907/scratch/Wenxuan/Works Summary/"
+source(paste0(path2, "Functions.R"), local = knitr::knit_global())
+path4 <- "/home/18209907/scratch/Wenxuan/Works Summary/Results_minmax_meta_outfree/"
+load(paste0(path4, "wx_nmf_res.RData"))
+path1 <- "/home/18209907/scratch/Wenxuan/Works Summary/data/"
+md_mm <- read.csv(paste0(path1, "minmax_meta_outfree.csv"), row.names = 1)
+#diet <- read.csv(paste0(path1, "minmax_diet.csv"), row.names = 1)
+
+##############
+
+N <- 177
+P <- 138
+itr <- 50
+K <- 10
+
+#The first data (metabolomics data)
+X1 <- md_mm
+
+#The second data (simulated data 1)
+W2 <- wx_nmf_res[[4]]$W
+
+#The third data (simulated data 2)
+w1 <- rep(1, P)
+w2 <- rep(c(0.1, 0.5, 0.8), c(46,46,46))
+w3 <- rep(c(0.7, 0.3, 0.2), c(60,60,18))
+w4 <- rep(c(0.25, 0.9, 0.4), c(30,48,60))
+
+W3 <- cbind(w1,w2,w3,w4)
+
+
+shape1 <- 0.5
+shape2 <- 0.8
+shape3 <- 0.3
+shape4 <- 1.2
+
+h1 <- c(rep(0, 9), rgamma(N-9, shape1)) # Observation 1-9 are 0
+h2 <- c(rgamma(40, shape2), rep(0, 9), rgamma(N-49, shape2)) # Observation 41-49 are 0
+h3 <- c(rgamma(70, shape3), rep(0, 9), rgamma(N-79, shape3)) # Observation 71-79 are 0
+h4 <- c(rgamma(100, shape4), rep(0, 9), rgamma(N-109, shape4)) # Observation 101-109 are 0
+#There are 36 observations are not related to one cluster
+H <- apply(rbind(h1,h2,h3,h4), 2, function(x) x/sum(x))
+
+noise <- rmvnorm(n = N, mean = rep(0, P), sigma = diag(0.1^2, P))     #sdev=0.1
+
+X3 <- t(W3%*%H) + noise
+X3s <- apply(X3, 2, function(x) (x-min(x))/(max(x)-min(x)))
+
+#H <- read.csv(file='H(X3s).csv', row.names = 1)
+#X3s <- read.csv(file='X3s(X3s).csv', row.names = 1)
+
+
+#Kmeans on X3s
+fit_X3s_km <- list()
+rss.X3s.km <- rep(NA, K)
+for(k in 1:K){
+  km.X3s <- kmeans(X3s, centers = k, nstart = 50) #
+  fit_X3s_km[[k]] <- km.X3s
+  rss.X3s.km[k] <- sum(km.X3s$withinss)
+}
+
+
+#SSMF on X3s
+fit_X3s <- list()
+for(i in 1:itr){
+  res <- list()
+  for(k in 1:K){
+    fit <- ssmf(as.matrix(X3s), k = k, lr = 0.001, H = t(unmap(fit_X3s_km[[k]]$cluster)))
+    res[[k]] <- fit
+  }
+  fit_X3s[[i]] <- res
+}
+
+rss.X3s <- matrix(NA, itr, K)
+for(i in 1:itr){
+  rss.X3s[i,] <- unlist(lapply(fit_X3s[[i]], function(x) x$SSE))
+}
+
+opt.rss <- apply(rss.X3s, 2, which.min)
+
+rss.X3s <- rep(NA, K)
+for(k in 1:K){
+  rss.X3s[k] <- fit_X3s[[opt.rss[k]]][[k]]$SSE
+}
+
+for(i in 1:10){
+  plot(prcomp(t(fit_X3s[[opt.rss[i]]][[i]]$H), center = F, scale. = F))
+}
+
+#optimal results
+opt_fit_X3s <- list()
+for(k in 1:K){
+  opt_fit_X3s[[k]] <- fit_X3s[[opt.rss[k]]][[k]]
+}
+
+#rss.X3s <- unlist(lapply(opt_fit_X3s, function(x) x$SSE))
+#gap statistics
+fit_gap_X3s <- gap(as.matrix(X3s), k.vector = 1:K, rss = rss.X3s)
+
+par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
+plot(x = c(1:K), y = fit_gap_X3s$gap, type='b', ylim=range((fit_gap_X3s$gap), (fit_gap_X3s$gap - fit_gap_X3s$standard.error)[-1]), xlab='K', ylab='GAP', main='A')
+lines(x = c(1:(K-1)), y = (fit_gap_X3s$gap - fit_gap_X3s$standard.error)[-1], col='blue', lty=2, type='b')
+#abline(v=fit_gap_X3s$optimal.k, lty=2, col='red')
+lines(x = rep(fit_gap_X3s$optimal.k, 2), y = range(fit_gap_X3s$gap), lty = 2, col='red')
+legend('topright', inset=c(-0.2,0), col=c('black', 'blue', 'red'), lty=c(1, 2, 2), legend = c('Gap', '-1 SE', 'Optimal K'), cex=0.8)
+
+matplot(opt_fit_X3s[[4]]$W, type='l', lty=1, col=c(1, 2, 4, 3), main='B', ylab='W', xlab='Variables', xaxt='n')
+axis(side = 1, at = c(1,seq(20,120, 20), 138), labels = c(1,seq(20,120, 20), 138))
+
+#boostrap
+
+
+
+B <- 1000
+fit_boot_X3s <- bootstrap(data=as.matrix(X3s), k=4, btimes=B, H = t(mclust::unmap(fit_X3s_km[[4]]$cluster)))
+#color <- c(rgb(228,26,28, maxColorValue = 255), rgb(55,126,184, maxColorValue = 255),
+#           rgb(77,175,74, maxColorValue = 255), rgb(152,78,163, maxColorValue = 255))
+#color <- colorspace::rainbow_hcl(5)[1:4]
+#color <- rainbow(4)
+color <- c(ggsci::pal_jco("default", alpha=0.8)(7)[2], ggsci::pal_jama("default", alpha=0.8)(7)[c(3:5)])
+par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
+matplot(fit_boot_X3s$W.est, type='n', xaxt='n', ylab='Features', main='C', ylim = range(fit_boot_X3s$lower,fit_boot_X3s$upper))
+for(i in 1:4){
+  alpha <- 0.2
+#  col <- switch(i, rgb(228,26,28,alpha, maxColorValue = 255), rgb(55,126,184,alpha, maxColorValue = 255),
+#                rgb(77,175,74,alpha, maxColorValue = 255), rgb(152,78,163,alpha, maxColorValue = 255))
+#  col <- colorspace::rainbow_hcl(5, alpha=alpha)[i]
+#  col <- rainbow(4, alpha=alpha)[i]
+  plat <- c(ggsci::pal_jco("default",alpha=alpha)(7)[2], ggsci::pal_jama("default", alpha=alpha)(7)[c(3:5)])
+  col <- switch(i, plat[1], plat[2], plat[3], plat[4])
+  polygon(c(1:138, 138:1), c(fit_boot_X3s$upper[,i], rev(fit_boot_X3s$lower[,i])), col = col,
+          border= col, lty = 1)
+}
+matplot(fit_boot_X3s$W.est, type='l', lty = 1, ylab='Features', add=T, col=color, lwd=2)
+legend('topright', inset=c(-0.1,0), legend = 1:4, fill=color[1:4])
+axis(1, at=c(1, seq(10, 130, 10), 138), labels = c(1, seq(10, 130, 10), 138))
+
+par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
+matplot(W3[,c(1,2,4,3)], type='l', lty = 1, ylab='Prototypes',
+        ylim = range(fit_boot_X3s$lower,fit_boot_X3s$upper), col = color[c(1,2,4,3)], lwd=2)
+legend('topright', inset=c(-0.1,0), legend = 1:4, fill=color[1:4])
+# matplot(opt_fit_X3s[[4]]$W[,c(1,2,4,3)], type='l', lty = 1)
+# legend('topleft', legend = 1:4, fill=color[1:4])
+
+pca_X3s <- prcomp(X3s, center = F, scale. = F)
+#color <- c('#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c')
+#color <- c('black', 'red', 'green', 'blue')
+library(caroline)
+par(mfrow=c(1,1))
+H_pmut <- as.data.frame(opt_fit_X3s[[4]]$H[c(1,2,4,3),])
+rownames(H_pmut) <- 1:4
+par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
+pies(lapply(apply(H_pmut, 2, list), unlist), color.table = nv(color[1:4], 1:4),
+     x0=pca_X3s$x[,1], y0=pca_X3s$x[,2], radii = 2.5, main='B', ylab='PC2', xlab='PC1')
+legend('topright', inset=c(-0.1,0), legend = 1:4, fill=color[1:4])
+
+#Compare H
+H_tepm <- H[c(1,2,4,3),]
+rownames(H_tepm) <- 1:4
+par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
+pies(lapply(apply(H_tepm, 2, list), unlist), color.table = nv(color[1:4], 1:4),
+     x0=pca_X3s$x[,1], y0=pca_X3s$x[,2], radii = 2, main='B', ylab='PC2', xlab='PC1')
+legend('topright', inset=c(-0.1,0), legend = 1:4, fill=color[1:4])
+
+
+library(xtable)
+cftab <- as.matrix(H_pmut) %*% t(H)
+cftab <- rbind(cftab, apply(cftab, 2, sum))
+cftab <- cbind(cftab, apply(cftab, 1, sum))
+cftab <- round(cftab,2)
+xtable(cftab)
+sARI(H_pmut, H)
+
+#################
+
+fit_X1_km <- list()
+rss.X1.km <- rep(NA, K)
+for(k in 1:K){
+  km.X1 <- kmeans(X1, centers = k, nstart = 50)
+  fit_X1_km[[k]] <- km.X1
+  rss.X1.km[k] <- sum(km.X1$withinss)
+}
+
+fit_X1 <- list()
+for(i in 1:itr){
+  res <- list()
+  for(k in 1:K){
+    res[[k]] <- ssmf(as.matrix(X1), k = k, lr = 0.01, H = t(unmap(fit_X1_km[[k]]$cluster)))
+  }
+  fit_X1[[i]] <- res
+}
+
+
+rss.X1 <- matrix(NA, itr, K)
+for(i in 1:itr){
+  rss.X1[i,] <- unlist(lapply(fit_X1[[i]], function(x) x$SSE))
+}
+
+opt.rss.X1 <- apply(rss.X1, 2, which.min)
+
+rss.X1 <- rep(NA, K)
+for(k in 1:K){
+  rss.X1[k] <- fit_X1[[opt.rss.X1[k]]][[k]]$SSE
+}
+
+
+opt_fit_X1 <- list()
+for(k in 1:K){
+  opt_fit_X1[[k]] <- fit_X1[[opt.rss.X1[k]]][[k]]
+}
+
+fit_gap_X1 <- gap(as.matrix(X1), k.vector = 1:K, rss = rss.X1)
+
+par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
+plot(x = c(1:K), y = fit_gap_X1$gap, type='b', ylim=range((fit_gap_X1$gap), (fit_gap_X1$gap - fit_gap_X1$standard.error)[-1]), xlab='K', ylab='GAP', main='A')
+lines(x = c(1:(K-1)), y = (fit_gap_X1$gap - fit_gap_X1$standard.error)[-1], col='blue', lty=2, type='b')
+lines(x = rep(fit_gap_X1$optimal.k, 2), y = range(fit_gap_X1$gap), lty = 2, col='red')
+lines(x = rep(4, 2), y = range(fit_gap_X1$gap), lty = 6, col='red')
+legend('topright', inset=c(-0.21,0), col=c('black', 'blue', 'red', 'red'), lty=c(1, 2, 2, 6), legend = c('Gap', '-1 SE', '1st Optimal K', '2nd Optimal K'), cex=0.8)
+
+
+fit_boot_X1 <- bootstrap(data=as.matrix(X1), k=4, btimes=B, H = t(mclust::unmap(fit_X1_km[[4]]$cluster)))
+
+par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
+matplot(fit_boot_X1$W.est, type='n', xaxt='n', ylab='Features', main='C', ylim=range(cbind(fit_boot_X1$lower,fit_boot_X1$upper)))
+for(i in 1:4){
+  alpha <- 0.2
+#  col <- switch(i, rgb(228,26,28,alpha, maxColorValue = 255), rgb(55,126,184,alpha, maxColorValue = 255),
+#                 rgb(152,78,163,alpha, maxColorValue = 255), rgb(77,175,74,alpha, maxColorValue = 255))
+  plat <- c(ggsci::pal_jco("default",alpha=alpha)(7)[2], ggsci::pal_jama("default", alpha=alpha)(7)[c(3:5)])
+  col <- switch(i, plat[1], plat[2], plat[4], plat[3])
+  polygon(c(1:138, 138:1), c(fit_boot_X1$lower[,i], rev(fit_boot_X1$upper[,i])), col = col, border= col, lty = 1)
+}
+axis(1, at=c(1, 20, 31, 41, 51, 123, 138), labels = c(1, 20, 31, 41, 51, 123, 138))
+matplot(fit_boot_X1$W.est[,c(1,2,4,3)], type='l', lty = 1, ylab='Features', add=T, col=color, lwd=2)
+legend('topright', inset=c(-0.1,0), legend = 1:4, fill=color[1:4])
+lines(x = rep(1, 2), y = range(cbind(fit_boot_X1$lower,fit_boot_X1$upper)), lty = 2, col='grey')
+lines(x = rep(20, 2), y = range(cbind(fit_boot_X1$lower,fit_boot_X1$upper)), lty = 2, col='grey')
+lines(x = rep(31, 2), y = range(cbind(fit_boot_X1$lower,fit_boot_X1$upper)), lty = 2, col='grey')
+lines(x = rep(41, 2), y = range(cbind(fit_boot_X1$lower,fit_boot_X1$upper)), lty = 2, col='grey')
+lines(x = rep(51, 2), y = range(cbind(fit_boot_X1$lower,fit_boot_X1$upper)), lty = 2, col='grey')
+lines(x = rep(123, 2), y = range(cbind(fit_boot_X1$lower,fit_boot_X1$upper)), lty = 2, col='grey')
+lines(x = rep(138, 2), y = range(cbind(fit_boot_X1$lower,fit_boot_X1$upper)), lty = 2, col='grey')
+text(x = c(10.5, 25.5, 36, 46, 87, 130.5), y=-1.6, labels = as.roman(1:6))
+
+
+pca_X1 <- prcomp(X1, center = F, scale. = F)
+#color <- c('#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c')
+#color <- c('black', 'red', 'green', 'blue')
+library(caroline)
+#H_pmut <- as.data.frame(opt_fit_X3s[[4]]$H[c(1,2,4,3),])
+#rownames(H_pmut) <- 1:4
+par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
+pies(lapply(apply(opt_fit_X1[[4]]$H, 2, list), unlist), color.table = nv(color[1:4], 1:4),
+     x0=pca_X1$x[,1], y0=pca_X1$x[,2], radii = 2.5, main='B', ylab='PC2', xlab='PC1')
+legend('topright', inset=c(-0.1,0), legend = 1:4, fill=color[1:4])
+
+
+
+
+n <- 2000
+temp <- rnorm(n, 10, 0.1)
+summary(temp)
+med_b <- rep(NA, B)
+for(i in 1:B){
+  ind <- sample(1:n, replace = TRUE, size = n)
+  df_b <- temp[ind]
+  med_b[i] <- median(df_b)
+}
+
+SE_boot <- sqrt(sum((med_b - mean(med_b))^2)/(B-1))
+SE_theo <- (1.253*sd(temp))/sqrt(n)
+
+print(c(SE_boot, SE_theo))
+
+
+
+
+CI_matrix <- c()
+for(i in 1:4){
+  CI_matrix <- cbind(CI_matrix, cbind(noquote(paste0(sprintf('%0.3f', fit_boot_X1$W.est[,i]), '(', sprintf('%0.3f', fit_boot_X1$lower[,i]), ', ',
+                                                     sprintf('%0.3f', fit_boot_X1$upper[,i]), ')', seq=''))))
+}
+colnames(CI_matrix) <- paste('Prototye', 1:4, '(Lower, Upper)')
+rownames(CI_matrix) <- colnames(X1)
+noquote(CI_matrix)
+
+xtable(CI_matrix)
+
+
+H_cofu_matrix <- opt_fit_X1[[4]]$H %*% t(opt_fit_X1[[4]]$H)
+H_cofu_matrix <- apply(H_cofu_matrix, 2, function(x) x/sum(x))
+H_cofu_matrix <- round(H_cofu_matrix, 2)
+H_cofu_matrix <- rbind(H_cofu_matrix, colSums(H_cofu_matrix))
+xtable(H_cofu_matrix)
