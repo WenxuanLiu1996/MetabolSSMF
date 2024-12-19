@@ -8,4 +8,6 @@ devtools::install_github("WenxuanLiu1996/MetabolSSMF")
 
 # Load the package
 library(MetabolSSMF)
+
+use_vignette(MetabolSSMF)
 ```
