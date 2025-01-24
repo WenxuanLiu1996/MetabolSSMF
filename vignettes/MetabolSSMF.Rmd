@@ -15,8 +15,7 @@ knitr::opts_chunk$set(
    collapse = TRUE,
    comment = "#>"
  )
-knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60), tidy=TRUE)
-knitr::opts_chunk$set(fig.width=7, fig.height=6) 
+knitr::opts_chunk$set(fig.width=7, fig.height=6)
 ```
 
 ```{r setup, include = FALSE}
@@ -65,10 +64,8 @@ H <- as.matrix(SimulatedMemberships)
 **Visualise the values of simulated prototype matrix** $W$
 
 ```{r, warning=FALSE}
-# Package for colour palettes
-library(ggsci)
 # Define 4 different colors
-color <- c(pal_jco("default", alpha=0.8)(7)[2], pal_jama("default", alpha=0.8)(7)[c(3:5)])
+color <- c(ggsci::pal_jco("default", alpha=0.8)(7)[2], ggsci::pal_jama("default", alpha=0.8)(7)[c(3:5)])
 
 par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
 matplot(t(W), type='l', lty = 1, ylab='Prototypes', col = color, lwd=2, ylim = c(0,1))
@@ -80,11 +77,9 @@ legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4])
 The scatter pies plot of the 2-dimensional projected clusters. It represents the simulated data with 4 soft clusters, the area of colour in the pies depicts the values of the soft membership of the observations.
 
 ```{r, warning=FALSE}
-# Package for pies plot
-library(caroline)
 pca_X <- prcomp(X, center = F, scale. = F) 
 par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
-pies(lapply(apply(H, 1, list), unlist), color.table = nv(color[1:4], paste0('Pty', 1:4)), x0=pca_X$x[,1], y0=pca_X$x[,2], radii = 2, ylab='PC2', xlab='PC1')
+caroline::pies(lapply(apply(H, 1, list), unlist), color.table = caroline::nv(color[1:4], paste0('Pty', 1:4)), x0=pca_X$x[,1], y0=pca_X$x[,2], radii = 2, ylab='PC2', xlab='PC1')
 legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4])
 ```
 
@@ -154,7 +149,7 @@ par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
 matplot(t(fit_boot$W.est[c(2,4,1,3),]), type='n', xaxt='n', ylab='Features', ylim = range(fit_boot$lower,fit_boot$upper))
 for(i in 1:4){
   alpha <- 0.2
-  plat <- c(pal_jco("default",alpha=alpha)(7)[2], pal_jama("default", alpha=alpha)(7)[c(3:5)])
+  plat <- c(ggsci::pal_jco("default",alpha=alpha)(7)[2], ggsci::pal_jama("default", alpha=alpha)(7)[c(3:5)])
   col <- switch(i, plat[1], plat[2], plat[3], plat[4])
   polygon(c(1:138, 138:1), c(fit_boot$upper[c(2,4,1,3),][i,], rev(fit_boot$lower[c(2,4,1,3),][i,])), col = col, border= col, lty = 1)
 }
@@ -169,7 +164,7 @@ Estimated prototypes are represented by the solid lines and the 4 colours repres
 
 ```{r, warning=FALSE}
 par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
-pies(lapply(apply(fit_SSMF[[4]]$H, 1, list), unlist), color.table = nv(color[1:4], c(4,3,2,1)), x0=pca_X$x[,1], y0=pca_X$x[,2], radii = 2, ylab='PC2', xlab='PC1') 
+caroline::pies(lapply(apply(fit_SSMF[[4]]$H, 1, list), unlist), color.table = caroline::nv(color[1:4], c(4,3,2,1)), x0=pca_X$x[,1], y0=pca_X$x[,2], radii = 2, ylab='PC2', xlab='PC1') 
 legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4])
 ```
 

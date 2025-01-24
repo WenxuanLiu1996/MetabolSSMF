@@ -77,7 +77,7 @@ fit3 <- ssmf(data, k = 4, meth = 'dirichlet')
 fit4 <- ssmf(data, k = 4)
 }
 \references{
-Abdolali, Maryam & Gillis, Nicolas. (2020). Simplex-Structured Matrix Factorization: Sparsity-based Identifiability and Provably Correct Algorithms. \url{https://doi.org/10.1137/20M1354982}
+Abdolali, Maryam & Gillis, Nicolas. (2020). Simplex-Structured Matrix Factorization: Sparsity-based Identifiability and Provably Correct Algorithms. <doi:10.1137/20M1354982>
 }
 \author{
 Wenxuan Liu
