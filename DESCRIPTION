@@ -5,7 +5,7 @@ Version: 0.1.0
 Author: Wenxuan Liu, Thomas Brendan Murphy and Lorraine Brennan
 Maintainer: Wenxuan Liu <wenxuan.liu@ucdconnect.ie>
 Description: An R Package for Soft Clustering in Metabolomics.
-License: MIT + file LICENSE
+License: NA
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.1
