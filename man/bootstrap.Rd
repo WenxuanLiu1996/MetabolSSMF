@@ -60,7 +60,7 @@ bootstrap(data = data , k = k, H = fit$H)
 }
 }
 \references{
-Stine, R. (1989). An Introduction to Bootstrap Methods: Examples and Ideas. Sociological Methods & Research, 18(2-3), 243-291. \url{https://doi.org/10.1177/0049124189018002003}
+Stine, R. (1989). An Introduction to Bootstrap Methods: Examples and Ideas. Sociological Methods & Research, 18(2-3), 243-291. <doi:10.1177/0049124189018002003>
 }
 \author{
 Wenxuan Liu

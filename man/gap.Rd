@@ -68,7 +68,7 @@ gap(data = data, rss = rss)
 }
 }
 \references{
-Tibshirani, R., Walther, G., & Hastie, T. (2001). Estimating the Number of Clusters in a Data Set via the Gap Statistic. Journal of the Royal Statistical Society. Series B (Statistical Methodology), 63(2), 411–423. http://www.jstor.org/stable/2680607
+Tibshirani, R., Walther, G., & Hastie, T. (2001). Estimating the Number of Clusters in a Data Set via the Gap Statistic. Journal of the Royal Statistical Society. Series B (Statistical Methodology), 63(2), 411–423. <doi:10.1111/1467-9868.00293>
 }
 \author{
 Wenxuan Liu

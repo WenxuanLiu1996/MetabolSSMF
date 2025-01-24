@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
    collapse = TRUE,
    comment = "#>"
  )
-knitr::opts_chunk$set(fig.width=7, fig.height=5)
+knitr::opts_chunk$set(fig.width=7, fig.height=6)
 ```
 
 ```{r setup, include = FALSE}
@@ -87,7 +87,7 @@ legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4])
 
 The SSMF algorithm can be run with $k=1, 2, \ldots, K$ using a `for` loop and the results can be saved to a list. The 'elbow criterion' or the gap statistic can be done as a subsequent step.
 
-```{r, eval=FALSE}
+```{r}
 # Set the maximum k that is used in loop.
 K <- 10
 
@@ -101,11 +101,6 @@ for(k in 1:K){
 
 **Plot the residual sum of squares ("elbow criterion")**
 
-```{r, include=FALSE}
-K <- 10
-load("~/Desktop/Projects/PhD Project/Wenxuan_Works/Github/MetabolSSMF/vignettes/results_ssmf.RData")
-```
-
 ```{r}
 # Extract the RSS and save as a vector
 rss_SSMF <- unlist(lapply(fit_SSMF, function(x) x$SSE))
@@ -118,7 +113,7 @@ If the 'elbow' is not clear, the gap statistic is suggested.
 
 **Gap statistic**
 
-```{r, eval=FALSE}
+```{r}
 # Apply the gap statistic to the simulated data
 fit_gap <- gap(X, rss = rss_SSMF)
 
@@ -130,21 +125,11 @@ lines(x = rep(fit_gap$optimal.k, 2), y = range(fit_gap$gap), lty = 2, col='red')
 legend('topright', inset=c(-0.35,0), col=c('black', 'blue', 'red'), lty=c(1, 2, 2), legend = c('Gap', '-1 SE', 'Optimal K'), cex=0.8)
 ```
 
-```{r, include=FALSE}
-load("~/Desktop/Projects/PhD Project/Wenxuan_Works/Github/MetabolSSMF/vignettes/results_gap.RData")
-
-par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
-plot(x = c(1:K), y = fit_gap$gap, type='b', ylim=range((fit_gap$gap), (fit_gap$gap - fit_gap$standard.error)[-1]), xlab='K', ylab='GAP', main='Gap statistic')
-lines(x = c(1:(K-1)), y = (fit_gap$gap - fit_gap$standard.error)[-1], col='blue', lty=2, type='b')
-lines(x = rep(fit_gap$optimal.k, 2), y = range(fit_gap$gap), lty = 2, col='red')
-legend('topright', inset=c(-0.35,0), col=c('black', 'blue', 'red'), lty=c(1, 2, 2), legend = c('Gap', '-1 SE', 'Optimal K'), cex=0.8)
-```
-
 The estimated number of prototypes is 4 from both the 'elbow criterion' and gap statistic.
 
 # Bootstrap
 
-```{r, eval=FALSE}
+```{r}
 # Set the number of times to bootstrap
 M <- 1000
 
@@ -158,10 +143,6 @@ fit_boot <- bootstrap(data = X, k = 4, H = initialisation$H, mtimes=M)
 Note: Usually the $H$ matrix is the output of the function `ssmf( )`. If $H$ is not supplied, the bootstrapped $W$ matrix might have different prototype orders from the outputs of the function `ssmf( )`.
 
 **Visualise the values of the bootstrap estimation and confidence intervals for the prototypes**
-
-```{r, include=FALSE}
-load("~/Desktop/Projects/PhD Project/Wenxuan_Works/Github/MetabolSSMF/vignettes/results_bootstrap.RData")
-```
 
 ```{r}
 par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)

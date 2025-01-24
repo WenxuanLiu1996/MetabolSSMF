@@ -136,7 +136,7 @@ init <- function(data = NULL, k = NULL, method = c('kmeans', 'uniform', 'dirichl
 #' @return \code{H} The optimised \eqn{H} matrix, containing the values of soft memberships.
 #' @return \code{SSE} The residuals sum of square.
 #' @export
-#' @references Abdolali, Maryam & Gillis, Nicolas. (2020). Simplex-Structured Matrix Factorization: Sparsity-based Identifiability and Provably Correct Algorithms. \url{https://doi.org/10.1137/20M1354982}
+#' @references Abdolali, Maryam & Gillis, Nicolas. (2020). Simplex-Structured Matrix Factorization: Sparsity-based Identifiability and Provably Correct Algorithms. <doi:10.1137/20M1354982>
 #' @author Wenxuan Liu
 #' @examples
 #'
@@ -360,7 +360,7 @@ diversity <- function(x, two.power=FALSE) {
 #' @return \code{gap} Gap value vector.
 #' @return \code{optimal.k} The optimal number of prototypes/clusters.
 #' @return \code{standard.error} Standard error vector.
-#' @references Tibshirani, R., Walther, G., & Hastie, T. (2001). Estimating the Number of Clusters in a Data Set via the Gap Statistic. Journal of the Royal Statistical Society. Series B (Statistical Methodology), 63(2), 411–423. http://www.jstor.org/stable/2680607
+#' @references Tibshirani, R., Walther, G., & Hastie, T. (2001). Estimating the Number of Clusters in a Data Set via the Gap Statistic. Journal of the Royal Statistical Society. Series B (Statistical Methodology), 63(2), 411–423. <doi:10.1111/1467-9868.00293>
 #' @author Wenxuan Liu
 #' @export
 #' @examples
@@ -445,7 +445,7 @@ gap <- function(data, rss, meth = c('kmeans', 'uniform', 'dirichlet', 'nmf'), it
 #' @return \code{W.est} The \eqn{W} matrix estimated by bootstrap.
 #' @return \code{lower} Lower bound of confidence intervals.
 #' @return \code{upper} Upper bound of confidence intervals.
-#' @references Stine, R. (1989). An Introduction to Bootstrap Methods: Examples and Ideas. Sociological Methods & Research, 18(2-3), 243-291. \url{https://doi.org/10.1177/0049124189018002003}
+#' @references Stine, R. (1989). An Introduction to Bootstrap Methods: Examples and Ideas. Sociological Methods & Research, 18(2-3), 243-291. <doi:10.1177/0049124189018002003>
 #' @author Wenxuan Liu
 #' @export
 #' @examples
@@ -505,7 +505,7 @@ bootstrap <- function(data, k, H, mtimes = 50, ncore = 2) {
 #'
 #'
 #' @return Soft adjusted Rand index.
-#' @references Flynt, A., Dean, N. & Nugent, R. sARI: a soft agreement measure for class partitions incorporating assignment probabilities. Adv Data Anal Classif 13, 303–323 (2019). \url{https://doi.org/10.1007/s11634-018-0346-x}
+#' @references Flynt, A., Dean, N. & Nugent, R. sARI: a soft agreement measure for class partitions incorporating assignment probabilities. Adv Data Anal Classif 13, 303–323 (2019). <doi:10.1007/s11634-018-0346-x>
 #' @author Wenxuan Liu
 #' @export
 #'

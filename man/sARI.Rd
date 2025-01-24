@@ -18,7 +18,7 @@ Soft adjusted Rand index.
 Soft adjusted Rand index, a soft agreement measure for class partitions incorporating assignment probabilities.
 }
 \references{
-Flynt, A., Dean, N. & Nugent, R. sARI: a soft agreement measure for class partitions incorporating assignment probabilities. Adv Data Anal Classif 13, 303–323 (2019). \url{https://doi.org/10.1007/s11634-018-0346-x}
+Flynt, A., Dean, N. & Nugent, R. sARI: a soft agreement measure for class partitions incorporating assignment probabilities. Adv Data Anal Classif 13, 303–323 (2019). <doi:10.1007/s11634-018-0346-x>
 }
 \author{
 Wenxuan Liu
