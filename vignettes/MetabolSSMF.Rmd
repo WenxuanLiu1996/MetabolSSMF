@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
    collapse = TRUE,
    comment = "#>"
  )
-knitr::opts_chunk$set(fig.width=7, fig.height=6)
+knitr::opts_chunk$set(fig.width=5, fig.height=4)
 ```
 
 ```{r LoadPackage, include = FALSE}
@@ -69,7 +69,7 @@ color <- c(ggsci::pal_jco("default", alpha=0.8)(7)[2], ggsci::pal_jama("default"
 
 par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
 matplot(t(W), type='l', lty = 1, ylab='Prototypes', col = color, lwd=2, ylim = c(0,1))
-legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4])
+legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4], cex = 0.8)
 ```
 
 **Visualise the values of simulated soft membership matrix** $H$ **in each observation**
@@ -79,8 +79,8 @@ The scatter pies plot of the 2-dimensional projected clusters. It represents the
 ```{r Visulisation2, warning=FALSE}
 pca_X <- prcomp(X, center = F, scale. = F) 
 par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
-caroline::pies(lapply(apply(H, 1, list), unlist), color.table = caroline::nv(color[1:4], paste0('Pty', 1:4)), x0=pca_X$x[,1], y0=pca_X$x[,2], radii = 2, ylab='PC2', xlab='PC1')
-legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4])
+caroline::pies(lapply(apply(H, 1, list), unlist), color.table = caroline::nv(color[1:4], paste0('Pty', 1:4)), x0=pca_X$x[,1], y0=pca_X$x[,2], radii = 1.5, ylab='PC2', xlab='PC1')
+legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4], cex = 0.8)
 ```
 
 # Choose the number of clusters
@@ -103,7 +103,6 @@ for(k in 1:K){
 
 ```{r, include=FALSE}
 K <- 10
-#load("~/Desktop/Projects/PhD Project/Wenxuan_Works/Github/MetabolSSMF/vignettes/results_ssmf.RData")
 ```
 
 ```{r RSS}
@@ -127,17 +126,15 @@ par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
 plot(x = c(1:K), y = fit_gap$gap, type='b', ylim=range((fit_gap$gap), (fit_gap$gap - fit_gap$standard.error)[-1]), xlab='K', ylab='GAP', main='Gap statistic')
 lines(x = c(1:(K-1)), y = (fit_gap$gap - fit_gap$standard.error)[-1], col='blue', lty=2, type='b')
 lines(x = rep(fit_gap$optimal.k, 2), y = range(fit_gap$gap), lty = 2, col='red')
-legend('topright', inset=c(-0.35,0), col=c('black', 'blue', 'red'), lty=c(1, 2, 2), legend = c('Gap', '-1 SE', 'Optimal K'), cex=0.8)
+legend('topright', inset=c(-0.35,0), col=c('black', 'blue', 'red'), lty=c(1, 2, 2), legend = c('Gap', '-1 SE', 'Optimal K'))
 ```
 
-```{r Visulisation3, include=FALSE}
-#load("results_gap.RData")
-
+```{r Visulisation3, echo=FALSE}
 par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
 plot(x = c(1:K), y = fit_gap$gap, type='b', ylim=range((fit_gap$gap), (fit_gap$gap - fit_gap$standard.error)[-1]), xlab='K', ylab='GAP', main='Gap statistic')
 lines(x = c(1:(K-1)), y = (fit_gap$gap - fit_gap$standard.error)[-1], col='blue', lty=2, type='b')
 lines(x = rep(fit_gap$optimal.k, 2), y = range(fit_gap$gap), lty = 2, col='red')
-legend('topright', inset=c(-0.35,0), col=c('black', 'blue', 'red'), lty=c(1, 2, 2), legend = c('Gap', '-1 SE', 'Optimal K'), cex=0.8)
+legend('topright', inset=c(-0.45,0), col=c('black', 'blue', 'red'), lty=c(1, 2, 2), legend = c('Gap', '-1 SE', 'Optimal K'), cex=0.8)
 ```
 
 The estimated number of prototypes is 4 from both the 'elbow criterion' and gap statistic.
@@ -159,10 +156,6 @@ Note: Usually the $H$ matrix is the output of the function `ssmf( )`. If $H$ is 
 
 **Visualise the values of the bootstrap estimation and confidence intervals for the prototypes**
 
-```{r, eval=FALSE}
-load("results_bootstrap.RData")
-```
-
 ```{r Visulisation4}
 par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
 matplot(t(fit_boot$W.est[c(2,4,1,3),]), type='n', xaxt='n', ylab='Features', ylim = range(fit_boot$lower,fit_boot$upper))
@@ -173,7 +166,7 @@ for(i in 1:4){
   polygon(c(1:138, 138:1), c(fit_boot$upper[c(2,4,1,3),][i,], rev(fit_boot$lower[c(2,4,1,3),][i,])), col = col, border= col, lty = 1)
 }
 matplot(t(fit_boot$W.est[c(2,4,1,3),]), type='l', lty = 1, ylab='Features', add=T, col=color, lwd=2)
-legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4])
+legend('topright', inset=c(-0.2,0), legend = 1:4, fill=color[1:4])
 axis(1, at=c(1, seq(10, 130, 10), 138), labels = c(1, seq(10, 130, 10), 138), cex=0.8)
 ```
 
@@ -183,8 +176,8 @@ Estimated prototypes are represented by the solid lines and the 4 colours repres
 
 ```{r Visulisation5, warning=FALSE}
 par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
-caroline::pies(lapply(apply(fit_SSMF[[4]]$H, 1, list), unlist), color.table = caroline::nv(color[1:4], c(4,3,2,1)), x0=pca_X$x[,1], y0=pca_X$x[,2], radii = 2, ylab='PC2', xlab='PC1') 
-legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4])
+caroline::pies(lapply(apply(fit_SSMF[[4]]$H, 1, list), unlist), color.table = caroline::nv(color[1:4], c(4,3,2,1)), x0=pca_X$x[,1], y0=pca_X$x[,2], radii = 1.5, ylab='PC2', xlab='PC1') 
+legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4], cex=0.8)
 ```
 
 # Soft Adjusted Rand Index (sARI)
