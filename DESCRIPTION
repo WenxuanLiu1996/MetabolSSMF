@@ -1,18 +1,31 @@
 Package: MetabolSSMF
 Type: Package
-Title: Simplex-structured matrix factorisation for metabolomic analysis
+Title: Simplex-Structured Matrix Factorisation for Metabolomics
+        Analysis
 Version: 0.1.0
-Author: Wenxuan Liu, Thomas Brendan Murphy and Lorraine Brennan
+Authors@R: c(person(given = "Wenxuan",
+                        family = "Liu",
+                        role = c("aut", "cre"),
+                        email = "wenxuan.liu@ucdconnect.ie"),
+                 person(given = c("Thomas", "Brendan"),
+                        family = "Murphy",
+                        role = "aut"),
+                 person(given = "Lorraine",
+                        family = "Brennan",
+                        role = "aut"))
 Maintainer: Wenxuan Liu <wenxuan.liu@ucdconnect.ie>
 Description: An R Package for Soft Clustering in Metabolomics.
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.1
-Imports: LaplacesDemon, NMF, doParallel, foreach, iterators, lsei, mclust, tidyr
-Suggests: 
-    knitr,
-    rmarkdown
+Imports: LaplacesDemon, NMF, doParallel, foreach, iterators, lsei,
+        mclust, tidyr
+Suggests: knitr, rmarkdown, caroline, ggsci, BiocManager, Biobase
 VignetteBuilder: knitr
-Depends: 
-    R (>= 2.10)
+Depends: R (>= 3.5.0)
 License: MIT + file LICENSE
+NeedsCompilation: no
+Packaged: 2025-02-17 07:25:37 UTC; vincentlau
+Author: Wenxuan Liu [aut, cre],
+  Thomas Brendan Murphy [aut],
+  Lorraine Brennan [aut]
