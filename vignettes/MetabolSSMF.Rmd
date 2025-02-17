@@ -10,17 +10,15 @@ vignette: >
 bibliography: references.bib
 ---
 
-```{r, include = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
    collapse = TRUE,
-   comment = "#>",
-   tidy.opts=list(width.cutoff=80), 
-   tidy=TRUE
+   comment = "#>"
  )
 knitr::opts_chunk$set(fig.width=7, fig.height=6)
 ```
 
-```{r setup, include = FALSE}
+```{r LoadPackage, include = FALSE}
 library(MetabolSSMF)
 set.seed(12345)
 ```
@@ -50,7 +48,7 @@ library(MetabolSSMF)
 
 The simulated data set is created by the product of a soft membership matrix $H$ and a prototype matrix $W$. A user can use a Dirichlet distribution to generate the values for the soft membership matrix $H$ with simplex structure. $W$ can be defined using a designed pattern. The package provides a simulated data set $X$, simulated prototype matrix $W$ and simulated membership matrix $H$. These can be loaded through the code `data(SimulatedDataset)`, `data(SimulatedPrototypes)` and `data(SimulatedMemberships)`, respectively.
 
-```{r}
+```{r Data}
 # Simulated data set X
 X <- as.matrix(SimulatedDataset)
 
@@ -65,7 +63,7 @@ H <- as.matrix(SimulatedMemberships)
 
 **Visualise the values of simulated prototype matrix** $W$
 
-```{r, warning=FALSE}
+```{r Visulisation1, warning=FALSE}
 # Define 4 different colors
 color <- c(ggsci::pal_jco("default", alpha=0.8)(7)[2], ggsci::pal_jama("default", alpha=0.8)(7)[c(3:5)])
 
@@ -78,7 +76,7 @@ legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4])
 
 The scatter pies plot of the 2-dimensional projected clusters. It represents the simulated data with 4 soft clusters, the area of colour in the pies depicts the values of the soft membership of the observations.
 
-```{r, warning=FALSE}
+```{r Visulisation2, warning=FALSE}
 pca_X <- prcomp(X, center = F, scale. = F) 
 par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
 caroline::pies(lapply(apply(H, 1, list), unlist), color.table = caroline::nv(color[1:4], paste0('Pty', 1:4)), x0=pca_X$x[,1], y0=pca_X$x[,2], radii = 2, ylab='PC2', xlab='PC1')
@@ -89,7 +87,7 @@ legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4])
 
 The SSMF algorithm can be run with $k=1, 2, \ldots, K$ using a `for` loop and the results can be saved to a list. The 'elbow criterion' or the gap statistic can be done as a subsequent step.
 
-```{r, eval=FALSE}
+```{r SSMF, eval=FALSE}
 # Set the maximum k that is used in loop.
 K <- 10
 
@@ -105,10 +103,10 @@ for(k in 1:K){
 
 ```{r, include=FALSE}
 K <- 10
-load("~/Desktop/Projects/PhD Project/Wenxuan_Works/Github/MetabolSSMF/vignettes/results_ssmf.RData")
+#load("~/Desktop/Projects/PhD Project/Wenxuan_Works/Github/MetabolSSMF/vignettes/results_ssmf.RData")
 ```
 
-```{r}
+```{r RSS}
 # Extract the RSS and save as a vector
 rss_SSMF <- unlist(lapply(fit_SSMF, function(x) x$SSE))
 
@@ -120,7 +118,7 @@ If the 'elbow' is not clear, the gap statistic is suggested.
 
 **Gap statistic**
 
-```{r, eval=FALSE}
+```{r Gap, eval=FALSE}
 # Apply the gap statistic to the simulated data
 fit_gap <- gap(X, rss = rss_SSMF)
 
@@ -132,8 +130,8 @@ lines(x = rep(fit_gap$optimal.k, 2), y = range(fit_gap$gap), lty = 2, col='red')
 legend('topright', inset=c(-0.35,0), col=c('black', 'blue', 'red'), lty=c(1, 2, 2), legend = c('Gap', '-1 SE', 'Optimal K'), cex=0.8)
 ```
 
-```{r, include=FALSE}
-load("~/Desktop/Projects/PhD Project/Wenxuan_Works/Github/MetabolSSMF/vignettes/results_gap.RData")
+```{r Visulisation3, include=FALSE}
+#load("results_gap.RData")
 
 par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
 plot(x = c(1:K), y = fit_gap$gap, type='b', ylim=range((fit_gap$gap), (fit_gap$gap - fit_gap$standard.error)[-1]), xlab='K', ylab='GAP', main='Gap statistic')
@@ -146,7 +144,7 @@ The estimated number of prototypes is 4 from both the 'elbow criterion' and gap 
 
 # Bootstrap
 
-```{r, eval=FALSE}
+```{r Bootstrap, eval=FALSE}
 # Set the number of times to bootstrap
 M <- 1000
 
@@ -161,11 +159,11 @@ Note: Usually the $H$ matrix is the output of the function `ssmf( )`. If $H$ is 
 
 **Visualise the values of the bootstrap estimation and confidence intervals for the prototypes**
 
-```{r, include=FALSE}
-load("~/Desktop/Projects/PhD Project/Wenxuan_Works/Github/MetabolSSMF/vignettes/results_bootstrap.RData")
+```{r, eval=FALSE}
+load("results_bootstrap.RData")
 ```
 
-```{r}
+```{r Visulisation4}
 par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
 matplot(t(fit_boot$W.est[c(2,4,1,3),]), type='n', xaxt='n', ylab='Features', ylim = range(fit_boot$lower,fit_boot$upper))
 for(i in 1:4){
@@ -183,7 +181,7 @@ Estimated prototypes are represented by the solid lines and the 4 colours repres
 
 **Visualise the values of the estimated soft membership matrix**
 
-```{r, warning=FALSE}
+```{r Visulisation5, warning=FALSE}
 par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
 caroline::pies(lapply(apply(fit_SSMF[[4]]$H, 1, list), unlist), color.table = caroline::nv(color[1:4], c(4,3,2,1)), x0=pca_X$x[,1], y0=pca_X$x[,2], radii = 2, ylab='PC2', xlab='PC1') 
 legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4])
@@ -191,7 +189,7 @@ legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4])
 
 # Soft Adjusted Rand Index (sARI)
 
-```{r}
+```{r sARI}
 # Compare the true and estimated soft membership matrix
 sARI(fit_SSMF[[4]]$H, H)
 
@@ -203,7 +201,7 @@ The sARI between estimated soft membership matrix and the true soft membership m
 
 # Shannon diversity index
 
-```{r}
+```{r Shannon}
 E <- rep(NA, nrow(fit_SSMF[[4]]$H))
 for(i in 1:nrow(fit_SSMF[[4]]$H)){
   E[i] <- diversity(fit_SSMF[[4]]$H[i,], two.power=T)
