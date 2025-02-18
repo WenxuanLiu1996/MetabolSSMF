@@ -3,7 +3,7 @@
 \docType{data}
 \name{SimulatedDataset}
 \alias{SimulatedDataset}
-\title{A simulated metabolomic dataset}
+\title{A simulated metabolomic dataset.}
 \format{
 A data frame with 177 rows and 138 columns.
 }

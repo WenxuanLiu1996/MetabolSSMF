@@ -519,7 +519,7 @@ sARI <- function(partition1, partition2) {
 
 
 #SimulatedDataset
-#' A simulated metabolomic dataset
+#' A simulated metabolomic dataset.
 #'
 #' A simulated metabolomic data set containing 138 variables for 177 individuals.
 #'
@@ -529,7 +529,7 @@ sARI <- function(partition1, partition2) {
 "SimulatedDataset"
 
 #SimulatedMemberships
-#' A simulated membership matrix
+#' A simulated membership matrix.
 #'
 #' A simulated membership matrix containing 4 cluster memberships for 177 individuals.
 #'
@@ -539,7 +539,7 @@ sARI <- function(partition1, partition2) {
 "SimulatedMemberships"
 
 #SimulatedPrototypes
-#' A simulated prototype matrix
+#' A simulated prototype matrix.
 #'
 #' A simulated prototype matrix containing 4 cluster prototypes.
 #'
@@ -547,3 +547,38 @@ sARI <- function(partition1, partition2) {
 #'
 #' @usage data(SimulatedPrototypes)
 "SimulatedPrototypes"
+
+#fit_SSMF
+#' Example results of SSMF.
+#'
+#' A list of the results for SSMF example for \eqn{k=1, 2, ..., 10}.
+#'
+#' @format A list with 10 items, each item is a results of SSMF,
+#' containing the values of the estimated prototype matrix (\eqn{W}) and
+#' the estimated membership matrix (\eqn{H}) matrix and the value of
+#' the residuals sum of square (SSE).
+#'
+#' @usage fit_SSMF
+"fit_SSMF"
+
+#fit_gap
+#' Example results of gap statistic.
+#'
+#' A list of the results for gap statistic example for \eqn{k=1, 2, ..., 10}.
+#'
+#' @format A list of gap statistic result, including the gap value vector,
+#' the optimal number of prototypes/clusters and the Standard error vector.
+#'
+#' @usage fit_gap
+"fit_gap"
+
+#fit_boot
+#' Example results of bootstrap.
+#'
+#' A list of the results for bootstrap example.
+#'
+#' @format A list of bootstrap result, including the values of estimated prototype matrix (\eqn{W}),
+#' the lower bound of confidence intervals and the upper bound of confidence intervals.
+#'
+#' @usage fit_boot
+"fit_boot"

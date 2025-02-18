@@ -3,7 +3,7 @@
 \docType{data}
 \name{SimulatedMemberships}
 \alias{SimulatedMemberships}
-\title{A simulated membership matrix}
+\title{A simulated membership matrix.}
 \format{
 A data frame with 177 rows and 4 columns.
 }

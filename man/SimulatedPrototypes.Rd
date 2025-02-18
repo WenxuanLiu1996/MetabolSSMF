@@ -3,7 +3,7 @@
 \docType{data}
 \name{SimulatedPrototypes}
 \alias{SimulatedPrototypes}
-\title{A simulated prototype matrix}
+\title{A simulated prototype matrix.}
 \format{
 A data frame with 4 rows and 138 columns.
 }
