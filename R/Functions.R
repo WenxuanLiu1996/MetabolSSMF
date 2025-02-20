@@ -39,7 +39,7 @@
 #' @export
 #' @examples
 #' # example code
-#' \dontrun{
+#' \donttest{
 #' init(data = SimulatedDataset, k = 4, method = 'kmeans')
 #' }
 
@@ -140,7 +140,7 @@ init <- function(data = NULL, k = NULL, method = c('kmeans', 'uniform', 'dirichl
 #' @author Wenxuan Liu
 #' @examples
 #'
-#' \dontrun{
+#' \donttest{
 #' library(MetabolSSMF)
 #'
 #' # Initialisation by user
@@ -365,7 +365,7 @@ diversity <- function(x, two.power=FALSE) {
 #' @export
 #' @examples
 #' # example code
-#' \dontrun{
+#' \donttest{
 #' data <- SimulatedDataset
 #'
 #' k <- 6
@@ -450,7 +450,7 @@ gap <- function(data, rss, meth = c('kmeans', 'uniform', 'dirichlet', 'nmf'), it
 #' @export
 #' @examples
 #' # example code
-#' \dontrun{
+#' \donttest{
 #' data <- SimulatedDataset
 #'
 #' k <- 4
@@ -505,7 +505,7 @@ bootstrap <- function(data, k, H, mtimes = 50, ncore = 2) {
 #'
 #'
 #' @return Soft adjusted Rand index.
-#' @references Flynt, A., Dean, N. & Nugent, R. sARI: a soft agreement measure for class partitions incorporating assignment probabilities. Adv Data Anal Classif 13, 303–323 (2019). <doi:10.1007/s11634-018-0346-x>
+#' @references Flynt, A., Dean, N. & Nugent, R. (2019) sARI: a soft agreement measure for class partitions incorporating assignment probabilities. Adv Data Anal Classif 13, 303–323 (2019). <doi:10.1007/s11634-018-0346-x>
 #' @author Wenxuan Liu
 #' @export
 #'

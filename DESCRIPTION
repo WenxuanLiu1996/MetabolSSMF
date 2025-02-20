@@ -14,7 +14,16 @@ Authors@R: c(person(given = "Wenxuan",
                         family = "Brennan",
                         role = "aut"))
 Maintainer: Wenxuan Liu <wenxuan.liu@ucdconnect.ie>
-Description: An R Package for Soft Clustering in Metabolomics.
+Description: Metabolomics is the measurement of metabolites in biological samples 
+        to reveal information on metabolic pathways and phenotypes. 
+        It provides a framework to perform soft clustering using 
+        simplex-structured matrix factorisation (SSMF). It contains a set of functions
+        for determining the optimal number of prototypes, the optimal algorithmic
+        parameters, the estimation confidence intervals and the diversity of clusters.
+        Abdolali, Maryam & Gillis, Nicolas (2020) <doi:10.1137/20M1354982>.
+        Tibshirani, R., Walther, G., & Hastie, T (2001) <doi:10.1111/1467-9868.00293>.
+        Stine, R (1989) <doi:10.1177/0049124189018002003>.
+        Flynt, A., Dean, N. & Nugent, R (2019) <doi:10.1007/s11634-018-0346-x>.
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.1

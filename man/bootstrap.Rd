@@ -49,7 +49,7 @@ where \eqn{t_{(0.025, n-1)}} and \eqn{t_{(0.975, n-1)}} is the quantiles of stud
 }
 \examples{
 # example code
-\dontrun{
+\donttest{
 data <- SimulatedDataset
 
 k <- 4

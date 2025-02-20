@@ -41,7 +41,7 @@ then the \eqn{H} is created by making the rows of the coefficient matrix lie in 
 }
 \examples{
 # example code
-\dontrun{
+\donttest{
 init(data = SimulatedDataset, k = 4, method = 'kmeans')
 }
 }

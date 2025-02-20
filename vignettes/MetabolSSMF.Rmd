@@ -70,6 +70,7 @@ color <- c(ggsci::pal_jco("default", alpha=0.8)(7)[2], ggsci::pal_jama("default"
 par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
 matplot(t(W), type='l', lty = 1, ylab='Prototypes', col = color, lwd=2, ylim = c(0,1))
 legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4], cex = 0.8)
+par(mar=c(5.1, 4.1, 4.1, 2.1), xpd=TRUE)
 ```
 
 **Visualise the values of simulated soft membership matrix** $H$ **in each observation**
@@ -81,6 +82,7 @@ pca_X <- prcomp(X, center = F, scale. = F)
 par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
 caroline::pies(lapply(apply(H, 1, list), unlist), color.table = caroline::nv(color[1:4], paste0('Pty', 1:4)), x0=pca_X$x[,1], y0=pca_X$x[,2], radii = 1.5, ylab='PC2', xlab='PC1')
 legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4], cex = 0.8)
+par(mar=c(5.1, 4.1, 4.1, 2.1), xpd=TRUE)
 ```
 
 # Choose the number of clusters
@@ -127,6 +129,7 @@ plot(x = c(1:K), y = fit_gap$gap, type='b', ylim=range((fit_gap$gap), (fit_gap$g
 lines(x = c(1:(K-1)), y = (fit_gap$gap - fit_gap$standard.error)[-1], col='blue', lty=2, type='b')
 lines(x = rep(fit_gap$optimal.k, 2), y = range(fit_gap$gap), lty = 2, col='red')
 legend('topright', inset=c(-0.35,0), col=c('black', 'blue', 'red'), lty=c(1, 2, 2), legend = c('Gap', '-1 SE', 'Optimal K'))
+par(mar=c(5.1, 4.1, 4.1, 2.1), xpd=TRUE)
 ```
 
 ```{r Visulisation3, echo=FALSE}
@@ -135,6 +138,7 @@ plot(x = c(1:K), y = fit_gap$gap, type='b', ylim=range((fit_gap$gap), (fit_gap$g
 lines(x = c(1:(K-1)), y = (fit_gap$gap - fit_gap$standard.error)[-1], col='blue', lty=2, type='b')
 lines(x = rep(fit_gap$optimal.k, 2), y = range(fit_gap$gap), lty = 2, col='red')
 legend('topright', inset=c(-0.45,0), col=c('black', 'blue', 'red'), lty=c(1, 2, 2), legend = c('Gap', '-1 SE', 'Optimal K'), cex=0.8)
+par(mar=c(5.1, 4.1, 4.1, 2.1), xpd=TRUE)
 ```
 
 The estimated number of prototypes is 4 from both the 'elbow criterion' and gap statistic.
@@ -168,6 +172,7 @@ for(i in 1:4){
 matplot(t(fit_boot$W.est[c(2,4,1,3),]), type='l', lty = 1, ylab='Features', add=T, col=color, lwd=2)
 legend('topright', inset=c(-0.2,0), legend = 1:4, fill=color[1:4])
 axis(1, at=c(1, seq(10, 130, 10), 138), labels = c(1, seq(10, 130, 10), 138), cex=0.8)
+par(mar=c(5.1, 4.1, 4.1, 2.1), xpd=TRUE)
 ```
 
 Estimated prototypes are represented by the solid lines and the 4 colours represent 4 clusters. Shadows around the lines are confidence intervals for the prototypes.
@@ -178,6 +183,7 @@ Estimated prototypes are represented by the solid lines and the 4 colours repres
 par(mar=c(5.1, 4.1, 4.1, 4.1), xpd=TRUE)
 caroline::pies(lapply(apply(fit_SSMF[[4]]$H, 1, list), unlist), color.table = caroline::nv(color[1:4], c(4,3,2,1)), x0=pca_X$x[,1], y0=pca_X$x[,2], radii = 1.5, ylab='PC2', xlab='PC1') 
 legend('topright', inset=c(-0.15,0), legend = 1:4, fill=color[1:4], cex=0.8)
+par(mar=c(5.1, 4.1, 4.1, 2.1), xpd=TRUE)
 ```
 
 # Soft Adjusted Rand Index (sARI)

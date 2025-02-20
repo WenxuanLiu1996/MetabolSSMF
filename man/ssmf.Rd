@@ -58,7 +58,7 @@ such that \eqn{\sum_{r=1}^k h_{ir}=1}  and  \eqn{h_{ir}\geq 0}.
 }
 \examples{
 
-\dontrun{
+\donttest{
 library(MetabolSSMF)
 
 # Initialisation by user

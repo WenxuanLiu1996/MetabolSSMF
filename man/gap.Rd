@@ -54,7 +54,7 @@ and \eqn{sd_k} is the standard deviation:
 }
 \examples{
 # example code
-\dontrun{
+\donttest{
 data <- SimulatedDataset
 
 k <- 6
