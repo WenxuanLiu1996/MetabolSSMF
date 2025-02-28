@@ -9,6 +9,7 @@ gap(
   rss,
   meth = c("kmeans", "uniform", "dirichlet", "nmf"),
   itr = 50,
+  lr = 0.01,
   ncore = 2
 )
 }
@@ -20,6 +21,8 @@ gap(
 \item{meth}{Character, specification of method to initialise the \eqn{W} and \eqn{H} matrix, see 'method' in init( ).}
 
 \item{itr}{Integer, number of Monte Carlo samples.}
+
+\item{lr}{Optimisation learning rate in ssmf().}
 
 \item{ncore}{The number of cores to use for parallel execution.}
 }

@@ -332,6 +332,7 @@ diversity <- function(x, two.power=FALSE) {
 #' @param rss Numeric vector, residual sum of squares from ssmf model using the number of clusters \eqn{1,2, \ldots, k}.
 #' @param meth Character, specification of method to initialise the \eqn{W} and \eqn{H} matrix, see 'method' in init( ).
 #' @param itr Integer, number of Monte Carlo samples.
+#' @param lr Optimisation learning rate in ssmf().
 #' @param ncore The number of cores to use for parallel execution.
 #'
 #' @details
@@ -378,7 +379,7 @@ diversity <- function(x, two.power=FALSE) {
 #' gap(data = data, rss = rss)
 #' }
 
-gap <- function(data, rss, meth = c('kmeans', 'uniform', 'dirichlet', 'nmf'), itr = 50, ncore = 2) {
+gap <- function(data, rss, meth = c('kmeans', 'uniform', 'dirichlet', 'nmf'), itr = 50, lr = 0.01, ncore = 2) {
 
   k.vector <- 1:length(rss)
 
@@ -388,7 +389,7 @@ gap <- function(data, rss, meth = c('kmeans', 'uniform', 'dirichlet', 'nmf'), it
     rss_b <- rep(NA, length(k.vector))
     data_b <- apply(data, 2, function(x) runif(length(x)))
     for (k in k.vector) {
-      fit_gap <- ssmf(data_b, k = k, meth = meth)
+      fit_gap <- ssmf(data_b, k = k, meth = meth, lr = lr)
       rss_b[k] <- fit_gap$SSE
     }
     rss_b
@@ -416,6 +417,7 @@ gap <- function(data, rss, meth = c('kmeans', 'uniform', 'dirichlet', 'nmf'), it
 #' @param H Matrix, input \eqn{H} matrix to start the algorithm. Usually the \eqn{H} matrix is the output of the function ssmf( ).
 #' If \eqn{H} is not supplied, the bootstrapped \eqn{W} matrix might have different prototype orders from the outputs of the function ssmf( ).
 #' @param mtimes Integer, number of bootstrap samples. Default number is 50.
+#' @param lr Optimisation learning rate in ssmf().
 #' @param ncore The number of cores to use for parallel execution.
 #'
 #' @details
@@ -460,7 +462,7 @@ gap <- function(data, rss, meth = c('kmeans', 'uniform', 'dirichlet', 'nmf'), it
 #' bootstrap(data = data , k = k, H = fit$H)
 #' }
 
-bootstrap <- function(data, k, H, mtimes = 50, ncore = 2) {
+bootstrap <- function(data, k, H, mtimes = 50, lr = 0.01, ncore = 2) {
   result <- list()
   n <- dim(data)[1]
   registerDoParallel(cores = ncore)
@@ -468,7 +470,7 @@ bootstrap <- function(data, k, H, mtimes = 50, ncore = 2) {
     ind <- sample(1:n, replace = TRUE, size = n)
     data_boot <- data[ind, ]
     H_boot <- H[ind,]
-    res_boot <- ssmf(as.matrix(data_boot), k = k, H = H_boot, lr = 0.001)
+    res_boot <- ssmf(as.matrix(data_boot), k = k, H = H_boot, lr = lr)
     res_boot
   }
   W_list <- lapply(out, function(x) x$W)

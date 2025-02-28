@@ -4,7 +4,7 @@
 \alias{bootstrap}
 \title{Bootstrap algorithm function.}
 \usage{
-bootstrap(data, k, H, mtimes = 50, ncore = 2)
+bootstrap(data, k, H, mtimes = 50, lr = 0.01, ncore = 2)
 }
 \arguments{
 \item{data}{Data matrix or data frame.}
@@ -15,6 +15,8 @@ bootstrap(data, k, H, mtimes = 50, ncore = 2)
 If \eqn{H} is not supplied, the bootstrapped \eqn{W} matrix might have different prototype orders from the outputs of the function ssmf( ).}
 
 \item{mtimes}{Integer, number of bootstrap samples. Default number is 50.}
+
+\item{lr}{Optimisation learning rate in ssmf().}
 
 \item{ncore}{The number of cores to use for parallel execution.}
 }
